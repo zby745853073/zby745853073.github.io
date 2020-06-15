@@ -1,388 +1,504 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>源码集合简历</title>
+<meta name="description" content="个人简历描述">
+<meta name="keywords" content="关键词" />
 
-	<head>
-		<meta charset="UTF-8">
-		<title>Document</title>
-		<style>
-			* {
-				padding: 0;
-				margin: 0;
-				border: 0;
-			}
-			/* *是通配符，给所有的元素去掉默认样式，因为有的浏览器会默认加上一些样式，这可能会给布局带来问题 */
-			
-			body {
-				width: 100%;
-				height: 100%;
-			}
-			/* 给body设置100%的高度和宽度，这样就会根据浏览器屏幕大小自动适配 */
-			
-			#container {
-				position: relative;
-				width: 620px;
-				height: 450px;
-				margin: 0 auto;
-				margin-top: 100px;
-				border-radius: 1px;
-			}
-			/* 这是包裹所有元素的DIV，给他设置620px的宽和450px的高，这个大小可以设置为更大，但是不能小，至少要能包含里面所有的元素 */
-			
-			#game {
-				position: absolute;
-				width: 450px;
-				height: 450px;
-				border-radius: 5px;
-				display: inline-block;
-				background-color: #ffe171;
-				box-shadow: 0 0 10px #ffe171;
-			}
-			/* 这是游戏区的DIV，这个大小是计算出来的，取决于你的小方块的大小。这里我们设置小方块的大小为150px 150px，所以这个大小是150px*3，为450px */
-			
-			#game div {
-				position: absolute;
-				width: 149px;
-				height: 149px;
-				box-shadow: 1px 1px 2px #777;
-				/*background-color: #20a6fa;*/
-				color: white;
-				text-align: center;
-				font-size: 150px;
-				line-height: 150px;
-				cursor: pointer;
-				-webkit-transition: 0.3s;
-				/*浏览器前缀，兼容其他浏览器 chrome*/
-				-moz-transition: 0.3s;
-				/*firefox*/
-				-ms-transition: 0.3s;
-				/*ie*/
-				-o-transition: 0.3s;
-				/*opera*/
-				transition: 0.3s;
-			}
-			/* 这就是小方块的大小了，定位为绝对定位，这样改变位置不会影响其他元素的位置。宽高都是149px。注意了，我们还设置了box-shadow:1px 1px 2px #777 ；
-  它还有边框阴影，所以149px 加上边框1px，它的总宽度是150px 下面的transition：0.3s是设置过渡时间，这是css3的属性，它会让属性改变呈现过渡动画，所以
-  当我们改变方块的位置时，它会有一个动画，我们不必自己编写动画函数，这回让你疯狂*/
-			
-			#game div:hover {
-				color: #ffe171;
-			}
-			/*给方块设置鼠标悬停动画，当鼠标悬停在元素上面时，会用这里的属性替换上面的属性，移开后又会变为原来的，这里我们是把字体颜色改变*/
-			
-			#control {
-				width: 150px;
-				height: 450px;
-				display: inline-block;
-				float: right;
-			}
-			/*控制区，display:inline-block会让元素呈现块状元素的特性，使得可以改变大小，同时也会具有行内元素的特性，使得不会占据一行空间，float:right让元素浮动到右边*/
-			
-			#control rowspan {
-				height: 25px;
-				font-size: 20px;
-				color: #222;
-				margin-top: 10px;
-			}
-			/*设置控制区按钮的共同样式*/
-			
-			#start {
-				display: inline-block;
-				font-size: 28px;
-				width: 100px;
-				height: 28px;
-				background-color: #20a6fa;
-				color: #ffe171;
-				text-shadow: 1px 1px 2px #ffe171;
-				border-radius: 5px;
-				box-shadow: 2px 2px 5px #4c98f5;
-				text-align: center;
-				cursor: pointer;
-			}
-			/*给start按钮设置属性。cursor:pointer属性让鼠标移到元素上面时会显示不同的鼠标形状，pointer是手型*/
-			
-			#reset {
-				display: inline-block;
-				font-size: 28px;
-				width: 100px;
-				height: 28px;
-				background-color: #20a6fa;
-				color: #ffe171;
-				text-shadow: 1px 1px 2px #ffe171;
-				/*字体阴影*/
-				border-radius: 5px;
-				/*圆角属性*/
-				box-shadow: 2px 2px 5px #4c98f5;
-				/*盒子阴影*/
-				text-align: center;
-				/*文字居中*/
-				cursor: pointer;
-			}
-			/*给Reset按钮设置属性*/
-			
-			#d1 {
-				left: 0px;
-				background: url(image/1.jpg);
-				background-size: 450px 450px;
-				background-position: 0 0;
-			}
-			
-			#d2 {
-				left: 150px;
-				background: url(image/1.jpg);
-				background-size: 450px 450px;
-				background-position: -150px 0;
-			}
-			
-			#d3 {
-				left: 300px;
-				background: url(image/1.jpg);
-				background-size: 450px 450px;
-				background-position: -300px 0;
-			}
-			
-			#d4 {
-				top: 150px;
-				background: url(image/1.jpg);
-				background-size: 450px 450px;
-				background-position: 0 -150px;
-			}
-			
-			#d5 {
-				top: 150px;
-				left: 150px;
-				background: url(image/1.jpg);
-				background-size: 450px 450px;
-				background-position: -150px -150px;
-			}
-			
-			#d6 {
-				top: 150px;
-				left: 300px;
-				background: url(image/1.jpg);
-				background-size: 450px 450px;
-				background-position: -300px -150px;
-			}
-			
-			#d7 {
-				top: 300px;
-				background: url(image/1.jpg);
-				background-size: 450px 450px;
-				background-position: 0 -300px;
-			}
-			
-			#d8 {
-				left: 150px;
-				top: 300px;
-				background: url(image/1.jpg);
-				background-size: 450px 450px;
-				background-position: -150px -300px;
-			}
-			/*这是预先给每个小方块按照顺序排好位置*/
-		</style>
-	</head>
+<!-- Favicons
+    ================================================== -->
 
-	<body>
-		<div id="container">
-			<!--最外面的DIV，用来包含里面的结构-->
-			<div id="game">
-				<!--游戏区,大DIV方块-->
-				<div id="d1" onclick="move(1)">1</div>
-				<!--小DIV，也就是8个小方块。当点击的时候执行move()函数，参数是显示的编号，这样我们就知道点击了哪个方块-->
-				<div id="d2" onclick="move(2)">2</div>
-				<div id="d3" onclick="move(3)">3</div>
-				<div id="d4" onclick="move(4)">4</div>
-				<div id="d5" onclick="move(5)">5</div>
-				<div id="d6" onclick="move(6)">6</div>
-				<div id="d7" onclick="move(7)">7</div>
-				<div id="d8" onclick="move(8)">8</div>
-			</div>
-			<div id="control">
-				<!--游戏控制区-->
-				<p>
-					<rowspan id="timeText">总用时</rowspan>
-					<rowspan id="timer"></rowspan>
-				</p>
-				<!--显示游戏时间区域-->
-				<p>
-					<rowspan id="start" onclick="start()">开始</rowspan>
-					<rowspan id="reset" onclick="reset()">重来</rowspan>
-				</p>
-				<!--显示控制按钮区域-->
+<link rel="shortcut icon" href="img/favicon_jianli.ico" type="image/x-icon">
+
+
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css"  href="css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="fonts/font-awesome/css/font-awesome.css">
+
+<!-- Slider
+    ================================================== -->
+<link href="css/owl.carousel.css" rel="stylesheet" media="screen">
+<link href="css/owl.theme.css" rel="stylesheet" media="screen">
+
+<!-- Stylesheet
+    ================================================== -->
+<link rel="stylesheet" type="text/css"  href="css/style.css">
+<link rel="stylesheet" type="text/css" href="css/prettyPhoto.css">
+
+<link rel="stylesheet" type="text/css" href="fonts/sns_fonts/iconfont.css">
+
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+    <!-- Navigation -->
+    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top"><i class="fa fa-terminal"></i>源码集合</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+                <ul class="nav navbar-nav">
+                    <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#services">基本资料</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#works">项目经验</a>
+                    </li>                    
+                    <li>
+                        <a class="page-scroll" href="#about">专业技能</a>
+                    </li>                    
+                    <li>
+                        <a class="page-scroll" href="#team">工作经历</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#testimonials">自我评价</a>
+                    </li>                    
+                    <li>
+                        <a class="page-scroll" href="#contact">联系方式</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+<!-- Header -->
+    <header class="intro">
+        <div class="intro-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <h1>简历<span class="brand-heading">-源码集合</span></h1>
+                        <p class="intro-text">喜欢技术，热爱挑战</p>
+                        <a href="#services" class="btn btn-circle page-scroll">
+                            <i class="fa fa-angle-double-down animated"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+<div class="copyrights">Baron简历 <a href="http://blog.youzewang.com/jianli" >前端工程师</a></div>
+<!-- Services Section -->
+<div id="services" class="text-center">
+  <div class="container">
+    <div class="section-title center">
+      <h2>基本 <strong>资料</strong></h2>
+      <hr>
+      </div>
+    <div class="space"></div>
+    <div class="row">
+      <div class="col-md-3 col-sm-6 service"> <i class="fa fa-laptop"></i>
+        <h4><strong>个人信息</strong></h4>
+        <p>
+		英文名: Baron &nbsp;性别：男</br>
+		年龄: 25岁 籍贯：湖南
+		</p>
+      </div>
+      <div class="col-md-3 col-sm-6 service"> <i class="fa fa-code"></i>
+        <h4><strong>专业学历</strong></h4>
+        <p>
+		专业：电子信息工程</br>
+		学历：大学本科</br>
+		
+		</p>
+      </div>
+      <div class="col-md-3 col-sm-6 service"> <i class="fa fa-rocket"></i>
+        <h4><strong>毕业学校</strong></h4>
+        <p>
+		  毕业学校：浙江理工大学</br>
+		  学习技能：编程
+		</p>
+      </div>
+      <div class="col-md-3 col-sm-6 service"> <i class="fa fa-bullseye"></i>
+        <h4><strong>联系方式</strong></h4>
+        <p>QQ：406641830</br>
+		  邮箱：admin@ymjihe.com</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Portfolio Section -->
+<div id="works">
+  <div class="container"> <!-- Container -->
+    <div class="section-title text-center center">
+      <h2>项目 <strong>经验</strong></h2>
+      <hr>
+      <div class="clearfix"></div>
+      <p>主要涉及电商，金融，家装领域，包括PC端，手机端，微信端，移动APP端等等，主要技术是HTML+CSS+JS</p>
+    </div>
+    <div class="categories">
+      <ul class="cat">
+        <li>
+          <ol class="type">
+            <li><a href="#" data-filter="*" class="active">所有</a></li>
+            <li><a href="#" data-filter=".web">PC端</a></li>
+            <li><a href="#" data-filter=".app">移动端</a></li>
+            <li><a href="#" data-filter=".branding">响应式</a></li>
+          </ol>
+        </li>
+      </ul>
+      <div class="clearfix"></div>
+    </div>
+    <div class="row">
+      <div class="portfolio-items">
+	  
+        <div class="col-sm-6 col-md-3 col-lg-3 web">
+          <div class="portfolio-item">
+            <div class="hover-bg">
+              <div class="hover-text">
+                <h4><a href='http://www.ymjihe.com' target='_blank' title="欧工商城">欧工商城</a></h4>
+                <small>技术：html+css+js</small>
+                <div class="clearfix"></div>
+                <i class="fa fa-search"></i> </div>
+              <img src="img/portfolio/01.jpg" class="img-responsive" alt="欧工商城"></div>
+          </div>
+        </div>
+		
+        <div class="col-sm-6 col-md-3 col-lg-3 web">
+          <div class="portfolio-item">
+            <div class="hover-bg">
+              <div class="hover-text">
+                <h4><a href="http://www.ymjihe.com" target='_blank' title="财树理财">财树理财</a></h4>
+                <small>技术：HTML+CSS+JQuery</small>
+                <div class="clearfix"></div>
+                <i class="fa fa-search"></i> </div>
+              <img src="img/portfolio/02.jpg" class="img-responsive" alt="财树理财"></div>
+          </div>
+        </div>
+		
+        <div class="col-sm-6 col-md-3 col-lg-3 web">
+          <div class="portfolio-item">
+            <div class="hover-bg">
+              <div class="hover-text">
+                <h4><a href="http://www.ymjihe.com" target='_blank' title="IT技术之家">IT技术之家</a></h4>
+                <small>技术：Bootstrap+JQuery</small>
+                <div class="clearfix"></div>
+                <i class="fa fa-search"></i> </div>
+              <img src="img/portfolio/03.jpg" class="img-responsive" alt="IT技术之家"></div>
+          </div>
+        </div>
+		
+        <div class="col-sm-6 col-md-3 col-lg-3 web">
+          <div class="portfolio-item">
+            <div class="hover-bg">
+              <div class="hover-text">
+                <h4><a href='http://www.ymjihe.com' target='_blank' title="久久基因">久久基因</h4>
+                <small>技术：Bootstrap+JQuery</small>
+                <div class="clearfix"></div>
+                <i class="fa fa-search"></i> </div>
+              <img src="img/portfolio/04.jpg" class="img-responsive" alt="久久基因"></div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3 web">
+          <div class="portfolio-item">
+            <div class="hover-bg">
+              <div class="hover-text">
+                <h4><a href='http://www.ymjihe.com' target='_blank' title="纵横基因">纵横基因</a></h4>
+                <small>技术：HTML+CSS+JQuery</small>
+                <div class="clearfix"></div>
+                <i class="fa fa-search"></i> </div>
+              <img src="img/portfolio/05.jpg" class="img-responsive" alt="纵横基因">
+			  </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3 branding">
+          <div class="portfolio-item">
+            <div class="hover-bg">
+              <div class="hover-text">
+                <h4><a href="http://www.ymjihe.com" target='_blank' title="浙江网新恒天UED">浙江网新恒天UED</a></h4>
+                <small>技术：Bootstrap+JQuery</small>
+                <div class="clearfix"></div>
+                <i class="fa fa-search"></i> </div>
+              <img src="img/portfolio/06.jpg" class="img-responsive" alt="浙江网新恒天UED"></div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3 branding app web">
+          <div class="portfolio-item">
+            <div class="hover-bg">
+              <div class="hover-text">
+                <h4><a href="http://www.ymjihe.com" target='_blank' title="个人博客">个人博客</a></h4>
+                <small>技术：HTMl+CSS+JS+Wordpress</small>
+                <div class="clearfix"></div>
+                <i class="fa fa-search"></i> </div>
+              <img src="img/portfolio/07.jpg" class="img-responsive" alt="个人博客"></div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3 web app">
+          <div class="portfolio-item">
+		  
+            <div class="hover-bg"> 
+              <div class="hover-text">
+                <h4><a href='http://www.ymjihe.com' target='_blank' title="软装大师">软装大师 </a></h4>
+                <small>技术：Bootstrap+JQuery</small>
+                <div class="clearfix"></div>
+                <i class="fa fa-search"></i> 
+				</div>
+              <img src="img/portfolio/08.jpg" class="img-responsive" alt="软装大师">
+		    </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- About Section -->
+<div id="about">
+  <div class="container">
+    <div class="section-title text-center center">
+      <h2><strong>专业</strong> 技能</h2>
+      <hr>
+    </div>
+    <div class="row">
+      <div class="col-md-6"> <img src="img/about.png" class="img-responsive"> </div>
+      <div class="col-md-6">
+        <div class="about-text"> <i class="fa fa-users"></i>
+          <div class="padding-left"><h4>PC端</h4>
+          <p>熟练使用HTML/CSS技术，精通Javascript/jquery编程,能够熟练使用angularjs，reactjs等前端MVC框架进行模块开发，熟练的使用grunt，gulp等前端工具，了解less，sass，stylus，coffeescript等前端新技术</p></div>
+          <i class="fa fa-magic"></i>
+          <div class="padding-left"><h4>移动端</h4>
+          <p>熟练使用zepto.js，Frozen ui，Amaze ui等移动框架进行移动页面的开发，熟练使用threejs等js引擎进行3d效果和H5游戏的开发.</p></div>
+          <i class="fa fa-check-square-o"></i>
+          <div class="padding-left"><h4>其它</h4>
+          <p>懂网站性能优化，网站百度排名和SEO优化，熟练使用photoshop等切图工具，会常见的UI技巧，懂Java，php等后台语言开发.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+	<div id="achivements" class="section dark-bg">
+			<div class="container">	
+				<div class="row">
+					<div class="col-md-3 col-sm-3">
+						<div class="achivement-box">
+							<i class="fa fa-smile-o"></i>
+							<span class="count">25</span>
+							<h4>Age Years</h4>                            
+						</div>
+					</div> 
+					<div class="col-md-3 col-sm-3">
+						<div class="achivement-box">
+							<i class="fa fa-code"></i>
+							<span class="count">100000</span>
+							<h4>Code Amount</h4>                            
+						</div>
+					</div> 
+					<div class="col-md-3 col-sm-3">
+						<div class="achivement-box">
+							<i class="fa fa-check-square-o"></i>
+							<span class="count">4800</span>
+                            <h4>Work Hour</h4>
+						</div>
+					</div> 
+					<div class="col-md-3 col-sm-3">
+						<div class="achivement-box">
+							<i class="fa fa-trophy"></i>
+							<span class="count">20</span>
+							<h4>Projects Amount</h4>                            
+						</div>
+					</div> 
+				</div>
 			</div>
 		</div>
-	</body>
-	<script>
-		var time = 0; //保存定时时间
-		var pause = true; //设置是否暂停标志，true表示暂停
-		var set_timer; //设置定时函数
-		var d = new Array(10); //保存大DIV当前装的小DIV的编号
-		var d_direct = new Array(
-			[0], //为了逻辑更简单，第一个元素我们不用，我们从下标1开始使用
-			[2, 4], //大DIV编号为1的DIV可以去的位置，比如第一块可以去2,4号位置
-			[1, 3, 5], [2, 6], [1, 5, 7], [2, 4, 6, 8], [3, 5, 9], [4, 8], [5, 7, 9], [6, 8]
-		); //保存大DIV编号的可移动位置编号
-		var d_posXY = new Array(
-			[0], //同样，我们不使用第一个元素
-			[0, 0], //第一个表示left,第二个表示top，比如第一块的位置为let:0px,top:0px
-			[150, 0], [300, 0], [0, 150], [150, 150], [300, 150], [0, 300], [150, 300], [300, 300]
-		); //大DIV编号的位置
-		d[1] = 1;
-		d[2] = 2;
-		d[3] = 3;
-		d[4] = 4;
-		d[5] = 5;
-		d[6] = 6;
-		d[7] = 7;
-		d[8] = 8;
-		d[9] = 0; //默认按照顺序排好，大DIV第九块没有，所以为0，我们用0表示空白块
-		function move(id) {
+<!-- Team Section -->
+<div id="team" class="text-center">
+  <div class="container">
+    <div class="section-title center">
+      <h2>人生 <strong>经历</strong></h2>
+      <hr>
+      <p>热爱互联网，热爱技术，专注于前端技术开发和用户体验</p>
+    </div>
+    <div id="row">
+	
+	<div class="col-md-3 col-sm-6">
+        <div class="thumbnail"> <img src="img/team/02.jpg" alt="浙江理工大学" class="img-circle team-img">
+          <div class="caption">
+            <h3>浙江理工大学</h3>
+            <p>电子信息工程</p>
+            <p>主要学习编程语言，前端技术，网站制作和开发，大学期间做过很多项目，很喜欢编程</p>
+          </div>
+        </div>
+      </div>
+	
+      <div class="col-md-3 col-sm-6">
+        <div class="thumbnail"> <img src="img/team/01.jpg" alt="杭州归谷培训中心" class="img-circle team-img">
+          <div class="caption">
+            <h3>杭州归谷培训中心</h3>
+            <p>前端培训</p>
+            <p>主要培训HTMl，CSS，JS，Jquery技术，还有ajax，ui等基础知识和一些常见的angular，react等MVC框架</p>
+          </div>
+        </div>
+      </div>
+	  
+      
+	  
+      <div class="col-md-3 col-sm-6">
+        <div class="thumbnail"> <img src="img/team/03.jpg" alt="浙大网新" class="img-circle team-img">
+          <div class="caption">
+            <h3>浙大网新</h3>
+            <p>前端工程师</p>
+            <p>工作时间：2014.5-2015.12，主要从事金融电商行业的网站开发，包括金融管理系统，电商网站，移动端商城等等</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="thumbnail"> <img src="img/team/04.jpg" alt="欧工国际" class="img-circle team-img">
+          <div class="caption">
+            <h3>欧工国际</h3>
+            <p>前端工程师</p>
+            <p>工作时间：2015.12-至今，主要从事欧工商城的前端页面开发，和用threejs引擎做网页3d效果包括移动端3d效果</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Testimonials Section -->
+<div id="testimonials" class="text-center">
+  <div class="container">
+    <div class="section-title center">
+      <h2>自我 <strong>评价</strong></h2>
+      <hr>
+    </div>
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <div id="testimonial" class="owl-carousel owl-theme">
+          <div class="item">       
+            <p>
+			热爱学习,良好的团队合作精神，能迅速融入新的团队。</br>易和人相处，拥有良好的亲和力。
+			</p>
+          </div>
+          <div class="item">
+            <p>
+			有强烈的责任感，工作踏实，性格开朗乐观，积极上进，吃苦耐劳。</br>能在较大的压力下保持良好的工作状态，善于自我调节。
+			</p>
+          </div>
+          <div class="item">
+            <p>
+			非常热爱编程，喜欢钻研新的技术，喜欢接受各种不同的挑战。</br>具有很强的自学能力和良好的学习方法。
+			</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-			//移动函数，前面我们已将讲了
-			var i = 1;
-			for(i = 1; i < 10; i++) {
-				if(d[i] == id)
-					break;
-			}
-			//这个for循环是找出小DIV在大DIV中的位置
-			var target_d = 0;
-			//保存小DIV可以去的编号，0表示不能移动
-			target_d = whereCanTo(i);
-			//用来找出小DIV可以去的位置，如果返回0，表示不能移动，如果可以移动，则返回可以去的位置编号
-			if(target_d != 0) {
-				d[i] = 0;
-				//把当前的大DIV编号设置为0，因为当前小DIV已经移走了，所以当前大DIV就没有装小DIV了
-				d[target_d] = id;
-				//把目标大DIV设置为被点击的小DIV的编号
-				document.getElementById("d" + id).style.left = d_posXY[target_d][0] + "px";
-				document.getElementById("d" + id).style.top = d_posXY[target_d][1] + "px";
-				//最后设置被点击的小DIV的位置，把它移到目标大DIV的位置
-			}
-			//如果target_d不为0，则表示可以移动，且target_d就是小DIV要去的大DIV的位置编号
-			var finish_flag = true;
-			//设置游戏是否完成标志，true表示完成
-			for(var k = 1; k < 9; ++k) {
-				if(d[k] != k) {
-					finish_flag = false;
-					break;
-					//如果大DIV保存的编号和它本身的编号不同，则表示还不是全部按照顺序排的，那么设置为false，跳出循环，后面不用再判断了，因为只要一个不符，就没完成游戏
-				}
-			}
-			//从1开始，把每个大DIV保存的编号遍历一下，判断是否完成
-			if(finish_flag == true) {
-				if(!pause)
-					start();
-				alert("congratulation");
-			}
-			//如果为true，则表示游戏完成，如果当前没有暂停，则调用暂停韩式，并且弹出提示框，完成游戏。
-			//start()这个函数是开始，暂停一起的函数，如果暂停，调用后会开始，如果开始，则调用后会暂停
-		}
+<!-- Contact Section -->
+<div id="contact" class="text-center">
+  <div class="container">
+    <div class="section-title center">
+      <h2><strong>联系</strong> 方式</h2>
+      <hr>
+    </div>
+    <div class="col-md-8 col-md-offset-2">
+      <div class="col-md-4"> <i class="fa fa-map-marker fa-2x"></i>
+        <p>上海市闵行区申滨路1058弄57号</p>
+      </div>
+      <div class="col-md-4"> <i class="fa fa-envelope-o fa-2x"></i>
+        <p>admin@ymjihe.com</p>
+      </div>
+      <div class="col-md-4"> <i class="fa fa-phone fa-2x"></i>
+        <p>QQ:406641830</p>
+      </div>
+      <hr>
+      <div class="clearfix"></div>
+    </div>
+    <div class="col-md-8 col-md-offset-2">
+      <hr>
+      <h3>给我发邮件</h3>
+      <form name="sentMessage" id="contactForm" novalidate>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <input type="text" id="name" class="form-control" placeholder="姓名" required="required">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <input type="email" id="email" class="form-control" placeholder="邮箱" required="required">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <textarea name="message" id="message" class="form-control" rows="4" placeholder="内容" required></textarea>
+          <p class="help-block text-danger"></p>
+        </div>
+        <div id="success"></div>
+        <button type="submit" class="btn btn-default">确认发送</button>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+<nav id="footer">
+  <div class="container">
+    <div class="pull-left fnav">
+      <p>Copyright &copy; 2016 作者：Baron. 前端工程师 
+    </div>
+    <div class="pull-right fnav">
+      <ul class="footer-social">
+	    <li><a href="http://v.t.sina.com.cn/share/share.php?url=http://blog.youzewang.com/jianli&title=Baron简历"><i class="icon iconfont">&#xe66e;</i></a></li>
+        <li><a href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.youzewang.com/jianli=&title=Baron简历"> <i class="icon iconfont">&#xe629;</i></a></li>
+        <li><a href="http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://blog.youzewang.com/jianli&title=Baron简历"> <i class="icon iconfont">&#xe616;</i></a></li>
 
-		function whereCanTo(cur_div) {
-			//判断是否可移动函数，参数是大DIV的编号，不是小DIV的编号，因为小DIV编号跟可以去哪没关系，小DIV是会动的
-			var j = 0;
-			var move_flag = false;
-			for(j = 0; j < d_direct[cur_div].length; j++) {
-				//把所有可能去的位置循环遍历一下
-				if(d[d_direct[cur_div][j]] == 0) {
-					move_flag = true;
-					break;
-				}
-				//如果目标的值为0，说明目标位置没有装小DIV，则可以移动，跳出循环
-			}
-			if(move_flag == true) {
-				return d_direct[cur_div][j];
-			} else {
-				return 0;
-			}
-			//可以移动，则返回目标位置的编号，否则返回0，表示不可移动
-		}
-		//定时函数，每一秒执行一次 b
-		function timer() {
-			time += 1; //一秒钟加一，单位是秒
-			var min = parseInt(time / 60); //把秒转换为分钟，一分钟60秒，取商就是分钟
-			var sec = time % 60; //取余就是秒
-			document.getElementById("timer").innerHTML = min + "分" + sec + "秒"; //然后把时间更新显示出来
-		}
-		//开始暂停函数
-		function start() {
-			if(pause) {
-				document.getElementById("start").innerHTML = "暂停"; //把按钮文字设置为暂停
-				pause = false; //暂停表示设置为false
-				set_timer = setInterval(timer, 1000); //启动定时
-				//如果当前是暂停，则开始
-			} else {
-				document.getElementById("start").innerHTML = "开始";
-				pause = true;
-				clearInterval(set_timer);
-			}
-		}
-		//重置函数
-		function reset() {
-			time = 0; //把时间设置为0
-			random_d(); //把方块随机打乱函数
-			if(pause) //如果暂停，则开始计时
-				start();
-		}
-		//随机打乱方块函数，我们的思路是从第九块开始，随机生成一个数，然后他们两块对调一下
-		function random_d() {
-			//			var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-			//			var newArr = arr.sort(function() {
-			//				return Math.random() - 0.5;
-			//			});
-			//			var num = 0;
-			//			var num1 = 0;
-			//			for(var k = 0; k < newArr.length; k++) {
-			//				if(newArr[k] > newArr[newArr.length - 1]) {
-			//					num1++;
-			//				}
-			//			}
-			//			for(var i = 0; i < newArr.length; i++) {
-			//				for(var j = i + 1; j < newArr.length; j++) {
-			//					if(newArr[i] > newArr[j]) {
-			//						num++;
-			//					}
-			//				}
-			//			}
-			//			console.log(newArr);
-			var num1 = 1;
-			var num = 2;
-			while((num - num1) % 2 != 0) {
-				var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-				num = 0;
-				num1 = 0
-				var newArr = arr.sort(function() {
-					return Math.random() - 0.5;
-				});
-				for(var k = 0; k < newArr.length; k++) {
-					if(newArr[k] > newArr[newArr.length - 1]) {
-						num1++;
-					}
-				}
-				for(var i = 0; i < newArr.length; i++) {
-					for(var j = i + 1; j < newArr.length; j++) {
-						if(newArr[i] > newArr[j]) {
-							num++;
-						}
-					}
-				}
-			}
-			console.log(num, num1, num - num1);
-			console.log(newArr);
-			for(var i = 1; i < 9; i++) {
-				var l = i - 1;
-				document.getElementById("d" + i).style.left = d_posXY[newArr[l]][0] + "px";
-				document.getElementById("d" + i).style.top = d_posXY[newArr[l]][1] + "px";
-				d[newArr[l]] = i;
-			}
-			console.log(d,newArr)
-			d.splice(newArr[8], 1, 0);
-			console.log(d);
-		}
+        <li><a href="http://share.renren.com/share/buttonshare.do?link=http://blog.youzewang.com/jianli&title=Baron简历"><i class="icon iconfont">&#xe66b;</i></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
-		//初始化函数，页面加载的时候调用重置函数，重新开始
-		window.onload = function() {
-			reset();
-		}
-	</script>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+<script type="text/javascript" src="js/jquery.1.11.1.js"></script> 
+<!-- Include all compiled plugins (below), or include individual files as needed --> 
+<script type="text/javascript" src="js/bootstrap.js"></script> 
+<script type="text/javascript" src="js/SmoothScroll.js"></script> 
+<script type="text/javascript" src="js/jquery.prettyPhoto.js"></script> 
+<script type="text/javascript" src="js/jquery.isotope.js"></script> 
+<script type="text/javascript" src="js/jquery.counterup.js"></script> 
+<script type="text/javascript" src="js/waypoints.js"></script>
+<script type="text/javascript" src="js/jqBootstrapValidation.js"></script> 
+<script type="text/javascript" src="js/contact_me.js"></script>
+<script src="js/owl.carousel.js"></script>
 
+<!-- Javascripts
+    ================================================== --> 
+<script type="text/javascript" src="js/main.js"></script>
+
+<script>
+ $(function()
+ {
+ var u = navigator.userAgent;
+if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1||u.indexOf('iPhone') > -1||u.indexOf('Windows Phone') > -1||navigator.userAgent.indexOf("iPad")>-1) {
+   $(".hover-bg .hover-text").css({'opacity':'1'});
+   
+   $(".hover-bg .hover-text>h4").css({'opacity':'1','-webkit-transform':'translateY(0)','transform':'translateY(0)'});
+   
+   $(".hover-bg .hover-text>i").css({'opacity':'1'});
+} 
+    
+ });
+  
+</script>
+</body>
 </html>
